@@ -1,32 +1,16 @@
+#include "Tracer.h"
 #include <iostream>
-#include "ThreadPool.h"
-
-
-void Task1() {
-	std::cout << "Completed Task One! \n";
-}
-
-void Task2() {
-	std::cout << "Completed Task Two! \n";
-}
-
-ThreadPool<2> threadPool;
 
 int main() {
-	threadPool.Enqueue(Task1);
-	threadPool.Enqueue(Task1);
-	threadPool.Enqueue(Task2);
-	threadPool.Enqueue(Task1);
-	threadPool.Enqueue(Task1);
-	threadPool.Enqueue(Task2);
-	threadPool.Enqueue(Task1);
-	threadPool.Enqueue(Task2);
-	threadPool.Enqueue(Task1);
+	Tracer::Begin("SleepTask");
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	Tracer::End();
 
+	Tracer::Begin("ComputeTask");
+	for (int i = 0; i < 1000000; ++i); // dummy work
+	Tracer::End();
 
-	while (threadPool.GetQueueSize() != 0)
-		continue;
+	Tracer::Export("trace.json");
 
-	std::cout << "Main thread finished" << std::endl;
-	return 0;
+	std::cout << "Trace exported!" << std::endl;
 }
