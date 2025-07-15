@@ -1,5 +1,5 @@
-#include "Tracer.h"
-#include <fstream>
+﻿#include <fstream>
+#include "ByteCore/Modules/Tracer.h"
 
 std::vector<TraceEvent> Tracer::complete = std::vector<TraceEvent>();
 std::vector<TraceEvent> Tracer::active = std::vector<TraceEvent>();
