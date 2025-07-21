@@ -10,16 +10,20 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 int main() {
+    // Check whether glfw is initialized
     if (!glfwInit()) {
         std::cerr << "Failed to init GLFW\n";
         return -1;
     }
 
+    // Set glfw versions
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6); // Match your GLAD version
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(1920, 1080, "ImGui + OpenGL", nullptr, nullptr);
+    // Create a window
+    GLFWwindow* window = glfwCreateWindow(1920, 1080, "Byte", nullptr, nullptr);
+    // Check if window is initialized correctly
     if (!window) {
         std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
