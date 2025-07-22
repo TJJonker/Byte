@@ -34,6 +34,19 @@ int main() {
             ImGuiWindowFlags_NoMove;
 
         ImGui::Begin("Byte", nullptr, windowFlags);
+
+        ImGui::BeginMainMenuBar();
+        {
+            if (ImGui::BeginMenu("View"))
+            {
+                if (ImGui::MenuItem("Profiler", "CTRL+P", ShowProfiler)) {
+                    ShowProfiler = !ShowProfiler;
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+
         ImGuiID dockspace_id = ImGui::GetID("ByteDockSpace");
         ImGui::DockSpace(dockspace_id);
         ImGui::End();
@@ -41,17 +54,7 @@ int main() {
         ImGui::Begin("something");
         ImGui::End();
 
-        //ImGui::BeginMainMenuBar();
-        //{
-        //    if (ImGui::BeginMenu("View"))
-        //    {
-        //        if (ImGui::MenuItem("Profiler", "CTRL+P", ShowProfiler)) {
-        //            ShowProfiler = !ShowProfiler;
-        //        }
-        //        ImGui::EndMenu();
-        //    }
-        //    ImGui::EndMainMenuBar();
-        //}
+
 
         Profiler();
 
