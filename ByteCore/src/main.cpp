@@ -1,78 +1,59 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
 #include <iostream>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
+#include <ByteCore/Core/Window.h>
+#include <ByteCore/Temp/ImGuiLayer.h>
+#include <imgui.h>
+
+bool ShowProfiler = false;
 
 int main() {
-    // Check whether glfw is initialized
-    if (!glfwInit()) {
-        std::cerr << "Failed to init GLFW\n";
-        return -1;
-    }
+    Byte::Window window;
+    window.Initialize();
+    window.CreateWindow(1920, 1080, "Byte");
 
-    // Set glfw versions
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6); // Match your GLAD version
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    ImGuiLayer imguiLayer;
+    imguiLayer.Initialize(window);
 
-    // Create a window
-    GLFWwindow* window = glfwCreateWindow(1920, 1080, "Byte", nullptr, nullptr);
-    // Check if window is initialized correctly
-    if (!window) {
-        std::cerr << "Failed to create GLFW window\n";
-        glfwTerminate();
-        return -1;
-    }
+    while (!window.ShouldClose()) {
+        window.PollEvents();
 
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSwapInterval(1); // Enable vsync
+        window.Clear();
+        imguiLayer.NewFrame();
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD\n";
-        return -1;
-    }
+        ImGui::BeginMainMenuBar();
+        {
+            if (ImGui::BeginMenu("View"))
+            {
+                if (ImGui::MenuItem("Profiler", "CTRL+P", ShowProfiler)) {
+                    ShowProfiler = !ShowProfiler;
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImFontConfig config;
-    config.SizePixels = 22.f;
-    io.Fonts->AddFontDefault(&config);
+        if (ShowProfiler) {
+            ImGui::Begin("Profiler", &ShowProfiler);
+            ImGui::Text("Hello Profiler");
+            static float frameTimes[100] = {};
+            static int index = 0;
+            frameTimes[index] = ImGui::GetIO().DeltaTime * 1000.0f; // ms
+            index = (index + 1) % 100;
 
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 460"); // Match your context
+            ImGui::PlotLines("Frame Times (ms)", frameTimes, IM_ARRAYSIZE(frameTimes), index, nullptr, 0.0f, 40.0f, ImVec2(0, 80));
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+            ImGui::End();
+        }
 
         // Sample UI
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
 
-        ImGui::Render();
-        glClearColor(0.1f, 0.12f, 0.15f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
+        imguiLayer.EndFrame();
+        window.SwapBuffer();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    imguiLayer.ShutDown();
+    window.ShutDown();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 0;
 }
