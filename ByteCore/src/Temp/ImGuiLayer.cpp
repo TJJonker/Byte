@@ -9,7 +9,10 @@ void ImGuiLayer::Initialize(Byte::Window& window)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     ImFontConfig config;
     config.SizePixels = 22.f;
     io.Fonts->AddFontDefault(&config);

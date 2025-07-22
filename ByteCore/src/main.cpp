@@ -6,6 +6,8 @@
 
 bool ShowProfiler = false;
 
+void Profiler();
+
 int main() {
     Byte::Window window;
     window.Initialize();
@@ -20,30 +22,38 @@ int main() {
         window.Clear();
         imguiLayer.NewFrame();
 
-        ImGui::BeginMainMenuBar();
-        {
-            if (ImGui::BeginMenu("View"))
-            {
-                if (ImGui::MenuItem("Profiler", "CTRL+P", ShowProfiler)) {
-                    ShowProfiler = !ShowProfiler;
-                }
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
 
-        if (ShowProfiler) {
-            ImGui::Begin("Profiler", &ShowProfiler);
-            ImGui::Text("Hello Profiler");
-            static float frameTimes[100] = {};
-            static int index = 0;
-            frameTimes[index] = ImGui::GetIO().DeltaTime * 1000.0f; // ms
-            index = (index + 1) % 100;
+        ImGuiWindowFlags windowFlags = 
+            ImGuiWindowFlags_NoTitleBar | 
+            ImGuiWindowFlags_NoCollapse | 
+            ImGuiWindowFlags_NoResize | 
+            ImGuiWindowFlags_NoMove;
 
-            ImGui::PlotLines("Frame Times (ms)", frameTimes, IM_ARRAYSIZE(frameTimes), index, nullptr, 0.0f, 40.0f, ImVec2(0, 80));
+        ImGui::Begin("Byte", nullptr, windowFlags);
+        ImGuiID dockspace_id = ImGui::GetID("ByteDockSpace");
+        ImGui::DockSpace(dockspace_id);
+        ImGui::End();
 
-            ImGui::End();
-        }
+        ImGui::Begin("something");
+        ImGui::End();
+
+        //ImGui::BeginMainMenuBar();
+        //{
+        //    if (ImGui::BeginMenu("View"))
+        //    {
+        //        if (ImGui::MenuItem("Profiler", "CTRL+P", ShowProfiler)) {
+        //            ShowProfiler = !ShowProfiler;
+        //        }
+        //        ImGui::EndMenu();
+        //    }
+        //    ImGui::EndMainMenuBar();
+        //}
+
+        Profiler();
 
         // Sample UI
         //ImGui::ShowDemoWindow();
@@ -56,4 +66,14 @@ int main() {
     window.ShutDown();
 
     return 0;
+}
+
+
+
+void Profiler() {
+    if (ShowProfiler) {
+        ImGui::Begin("Profiler", &ShowProfiler);
+
+        ImGui::End();
+    }
 }
